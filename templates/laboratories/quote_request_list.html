@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% block title %}Quote Requests - TestLab Finder{% endblock %}
+
+{% block content %}
+<div class="card border-0 shadow-sm rounded-4">
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+                <h1 class="h3 mb-1">Quote requests</h1>
+                <p class="text-muted mb-0">Review incoming testing requirements and respond with a quotation.</p>
+            </div>
+            {% if user.is_company_user %}
+                <a href="{% url 'request-quote' %}" class="btn btn-primary">New request</a>
+            {% endif %}
+        </div>
+        {% if quote_requests %}
+            <div class="table-responsive">
+                <table class="table align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Company</th>
+                            <th>Test type</th>
+                            <th>Laboratory</th>
+                            <th>Status</th>
+                            <th>Timeline</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for quote in quote_requests %}
+                            <tr>
+                                <td>
+                                    <div class="fw-semibold">{{ quote.company_name|default:quote.contact_name|default:quote.requested_by.get_full_name|default:quote.requested_by.username }}</div>
+                                    <div class="small text-muted">{{ quote.contact_email }}</div>
+                                </td>
+                                <td>{{ quote.test_type|default:quote.subject|default:'Testing requirements' }}</td>
+                                <td>{{ quote.laboratory|default:'Pending assignment' }}</td>
+                                <td><span class="badge rounded-pill bg-info-subtle text-info">{{ quote.get_status_display }}</span></td>
+                                <td>{{ quote.preferred_timeline|default:'Not specified' }}</td>
+                                <td>
+                                    {% if user.is_super_admin or user.is_lab_admin %}
+                                        <a href="{% url 'quote-response' quote.pk %}" class="btn btn-sm btn-outline-primary">Respond</a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p class="text-muted mb-0">No quote requests have been submitted yet.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

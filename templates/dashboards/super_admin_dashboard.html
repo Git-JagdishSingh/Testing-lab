@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% block title %}Super Admin Dashboard - TestLab Finder{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <div class="col-12">
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+            <div class="card-body p-4 p-lg-5 bg-dark text-white">
+                <p class="text-uppercase small fw-semibold mb-2">Super Admin Dashboard</p>
+                <h1 class="h3 mb-2">Monitor platform-wide activity, labs, appointments, and quotations.</h1>
+                <p class="mb-0 text-white-50">This workspace gives you full oversight across the platform and quick access to every operational module.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm rounded-4 h-100">
+            <div class="card-body">
+                <h2 class="h5 mb-3">Platform overview</h2>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item px-0 d-flex justify-content-between"><span>Users</span><strong>{{ user_count }}</strong></li>
+                    <li class="list-group-item px-0 d-flex justify-content-between"><span>Laboratories</span><strong>{{ laboratory_count }}</strong></li>
+                    <li class="list-group-item px-0 d-flex justify-content-between"><span>Approved labs</span><strong>{{ approved_laboratory_count }}</strong></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm rounded-4 h-100">
+            <div class="card-body">
+                <h2 class="h5 mb-3">Operations</h2>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item px-0 d-flex justify-content-between"><span>Appointments</span><strong>{{ appointment_count }}</strong></li>
+                    <li class="list-group-item px-0 d-flex justify-content-between"><span>Quotation requests</span><strong>{{ quotation_count }}</strong></li>
+                    <li class="list-group-item px-0 d-flex justify-content-between"><span>Featured listings</span><strong>{{ featured_lab_count }}</strong></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm rounded-4 h-100">
+            <div class="card-body">
+                <h2 class="h5 mb-3">Revenue and growth</h2>
+                <p class="text-muted mb-2">Appointments and quote volume indicate the platform demand for the current period.</p>
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span>Appointments</span>
+                    <span class="badge bg-primary-subtle text-primary">{{ revenue_summary.appointments }}</span>
+                </div>
+                <div class="d-flex justify-content-between align-items-center">
+                    <span>Quote requests</span>
+                    <span class="badge bg-success-subtle text-success">{{ revenue_summary.quotes }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

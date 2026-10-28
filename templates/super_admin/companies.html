@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block title %}Super Admin Companies{% endblock %}
+
+{% block content %}
+<div class="card shadow-sm border-0 rounded-4">
+    <div class="card-body">
+        <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 mb-4">
+            <div>
+                <h1 class="h3 mb-1">Companies</h1>
+                <p class="text-muted mb-0">Review registered companies, their activity, and account status.</p>
+            </div>
+            <form method="get" class="d-flex gap-2">
+                <input type="text" class="form-control" name="q" value="{{ query }}" placeholder="Search companies">
+                <button class="btn btn-primary" type="submit">Search</button>
+            </form>
+        </div>
+
+        {% if companies %}
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead>
+                        <tr>
+                            <th>Company</th>
+                            <th>Email</th>
+                            <th>Status</th>
+                            <th>Joined</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for company in companies %}
+                            <tr>
+                                <td>{{ company.name|default:company.username }}</td>
+                                <td>{{ company.email }}</td>
+                                <td>{% if company.is_active %}<span class="badge bg-success">Active</span>{% else %}<span class="badge bg-secondary">Inactive</span>{% endif %}</td>
+                                <td>{{ company.date_joined|date:'M d, Y' }}</td>
+                                <td>
+                                    <a class="btn btn-sm btn-outline-primary" href="{% url 'super-admin-user-edit' company.pk %}">Manage</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="alert alert-info mb-0">No companies found. New signed-up companies will appear here automatically.</div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

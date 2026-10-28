@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block title %}Email verified{% endblock %}
+
+{% block content %}
+<div class="text-center py-5">
+    <h2 class="fw-bold">Email verified successfully</h2>
+    <p class="lead">Your account is now active. You can log in and continue exploring the platform.</p>
+    <a class="btn btn-primary" href="{% url 'login' %}">Login</a>
+</div>
+{% endblock %}

@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+
+{% block title %}Laboratory Directory{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <div class="col-lg-3">
+        <div class="card shadow-sm p-3">
+            <h5 class="fw-bold mb-3">Filter laboratories</h5>
+            <form method="get">
+                <div class="mb-3">
+                    <label class="form-label">Search</label>
+                    <input type="text" name="q" class="form-control" value="{{ request.GET.q }}" placeholder="Name / keyword">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">City</label>
+                    <input type="text" name="city" class="form-control" value="{{ request.GET.city }}">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">State</label>
+                    <input type="text" name="state" class="form-control" value="{{ request.GET.state }}">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Category</label>
+                    <select class="form-select" name="category">
+                        <option value="">Any category</option>
+                        {% for category in categories %}
+                            <option value="{{ category.category_name }}" {% if request.GET.category == category.category_name %}selected{% endif %}>{{ category.category_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Minimum rating</label>
+                    <select class="form-select" name="rating">
+                        <option value="">Any rating</option>
+                        <option value="4" {% if request.GET.rating == '4' %}selected{% endif %}>4+</option>
+                        <option value="3" {% if request.GET.rating == '3' %}selected{% endif %}>3+</option>
+                        <option value="2" {% if request.GET.rating == '2' %}selected{% endif %}>2+</option>
+                    </select>
+                </div>
+                <button class="btn btn-primary w-100" type="submit">Apply filters</button>
+            </form>
+        </div>
+    </div>
+    <div class="col-lg-9">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 class="h4 fw-bold">Laboratory directory</h2>
+            <span class="text-muted">{{ page_obj.paginator.count }} results</span>
+        </div>
+        <div class="row g-4">
+            {% for lab in labs %}
+                <div class="col-md-6">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <h5 class="card-title">{{ lab.name }}</h5>
+                                <span class="badge bg-success">{{ lab.average_rating }} ★</span>
+                            </div>
+                            <p class="text-muted small">{{ lab.description|truncatewords:25 }}</p>
+                            <p class="mb-1"><i class="bi bi-geo-alt-fill"></i> {{ lab.city }}, {{ lab.state }}</p>
+                            <p class="mb-2"><i class="bi bi-tools"></i> {% for category in lab.categories.all %}{{ category.category_name }}{% if not forloop.last %}, {% endif %}{% endfor %}</p>
+                            <a href="{% url 'laboratory-detail' lab.slug %}" class="btn btn-outline-primary btn-sm">Open profile</a>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-12">
+                    <div class="alert alert-info">No labs match your current filters.</div>
+                </div>
+            {% endfor %}
+        </div>
+
+        {% if is_paginated %}
+            <nav class="mt-4">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                        <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a></li>
+                    {% endif %}
+                    <li class="page-item active"><span class="page-link">{{ page_obj.number }}</span></li>
+                    {% if page_obj.has_next %}
+                        <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

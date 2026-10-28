@@ -1,0 +1,197 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ lab.name }}{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+                    <div>
+                        <h2 class="fw-bold">{{ lab.name }}</h2>
+                        <p class="text-muted mb-0">{{ lab.city }}, {{ lab.state }}</p>
+                    </div>
+                    <span class="badge bg-success fs-6">{{ lab.average_rating }} ★</span>
+                </div>
+                <p class="mt-3">{{ lab.description }}</p>
+                <div class="row mt-4">
+                    <div class="col-md-6">
+                        <h5 class="fw-semibold">Services</h5>
+                        <p>{% for category in lab.categories.all %}{{ category.category_name }}{% if not forloop.last %}, {% endif %}{% endfor %}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h5 class="fw-semibold">Address</h5>
+                        <p>{{ lab.address }}</p>
+                    </div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-md-12">
+                        <h5 class="fw-semibold">Contact Details</h5>
+                        <ul class="list-unstyled mb-4">
+                            <li><strong>Phone:</strong> {{ lab.phone|default:'Not listed' }}</li>
+                            <li><strong>Email:</strong> {{ lab.email|default:'Not listed' }}</li>
+                            {% if lab.website %}
+                                <li><strong>Website:</strong> <a href="{{ lab.website }}" target="_blank" rel="noopener noreferrer">{{ lab.website }}</a></li>
+                            {% else %}
+                                <li><strong>Website:</strong> Not listed</li>
+                            {% endif %}
+                            {% if lab.address %}
+                                <li><strong>Address:</strong> {{ lab.address }}</li>
+                            {% endif %}
+                        </ul>
+                        <h5 class="fw-semibold">Accreditation</h5>
+                        <p>{{ lab.accreditation|default:'Not listed' }}</p>
+                        <h6 class="mt-4 fw-semibold">Certificates</h6>
+                        {% if certificates %}
+                            <div class="row g-2">
+                                {% for certificate in certificates|slice:":3" %}
+                                    <div class="col-6 col-md-4">
+                                        <a href="{{ certificate.image.url }}" target="_blank" class="d-block overflow-hidden rounded border">
+                                            <img src="{{ certificate.image.url }}" alt="Certificate {{ forloop.counter }}" class="img-fluid" style="height: 180px; width: 100%; object-fit: cover;">
+                                        </a>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            {% if certificates.count > 3 and lab.website %}
+                                <div class="mt-3">
+                                    <a href="{{ lab.website }}" target="_blank" class="btn btn-link">View More →</a>
+                                </div>
+                            {% endif %}
+                        {% else %}
+                            <p class="text-muted">No accreditation certificates available.</p>
+                        {% endif %}
+                        <div class="text-center mt-4">
+                            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#bookAppointmentModal">
+                                Book Appointment
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                {% if user.is_authenticated and user == lab.owner %}
+                    <a href="{% url 'laboratory-update' lab.slug %}" class="btn btn-outline-primary mt-3">Edit laboratory</a>
+                {% elif user.is_authenticated and user.is_super_admin %}
+                    <a href="{% url 'laboratory-update' lab.slug %}" class="btn btn-outline-primary mt-3">Edit laboratory</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="fw-semibold">Map preview</h5>
+                <div class="bg-secondary rounded p-5 text-white text-center">Google Maps integration placeholder</div>
+                <p class="small text-muted mt-2">Replace this area with the Google Maps embed for {{ lab.name }}.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm mt-4">
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center">
+            <h4 class="fw-bold">Reviews</h4>
+            {% if user.is_authenticated %}
+                <a href="{% url 'review-create' lab.slug %}" class="btn btn-primary">Write a review</a>
+            {% else %}
+                <a href="{% url 'login' %}" class="btn btn-outline-secondary">Login to review</a>
+            {% endif %}
+        </div>
+        {% for review in reviews %}
+            <div class="border rounded p-3 mt-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <strong>{{ review.user.username }}</strong>
+                    <span class="badge bg-warning text-dark">{{ review.rating }} ★</span>
+                </div>
+                <p class="mt-2 mb-2">{{ review.review_text }}</p>
+                <small class="text-muted">{{ review.created_at }}</small>
+                {% if user.is_authenticated and review.user == user %}
+                    <div class="mt-2">
+                        <a href="{% url 'review-update' review.pk %}" class="btn btn-sm btn-outline-primary">Edit</a>
+                        <a href="{% url 'review-delete' review.pk %}" class="btn btn-sm btn-outline-danger">Delete</a>
+                    </div>
+                {% endif %}
+            </div>
+        {% empty %}
+            <p class="text-muted mt-3">No reviews yet. Be the first to share feedback.</p>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Book Appointment Modal -->
+<div class="modal fade" id="bookAppointmentModal" tabindex="-1" aria-labelledby="bookAppointmentModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="bookAppointmentModalLabel">Book Appointment</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="appointmentForm" method="post" action="{% url 'appointment-create' lab.slug %}" novalidate>
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="appointmentName" class="form-label">Full Name</label>
+                        <input name="full_name" type="text" class="form-control" id="appointmentName" required>
+                        <div class="invalid-feedback">Please enter your full name.</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="appointmentPhone" class="form-label">Contact Number</label>
+                        <input name="contact_number" type="tel" class="form-control" id="appointmentPhone" pattern="[0-9+\-() ]{7,20}" required>
+                        <div class="invalid-feedback">Please enter a valid contact number.</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="appointmentEmail" class="form-label">Email Address</label>
+                        <input name="email_address" type="email" class="form-control" id="appointmentEmail" required>
+                        <div class="invalid-feedback">Please enter a valid email address.</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="appointmentDate" class="form-label">Appointment Date</label>
+                        <input name="appointment_date" type="date" class="form-control" id="appointmentDate" required>
+                        <div class="invalid-feedback" id="appointmentDateFeedback">Please choose a future appointment date.</div>
+                    </div>
+                    <div class="text-end">
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var appointmentForm = document.getElementById('appointmentForm');
+    var appointmentDate = document.getElementById('appointmentDate');
+    var appointmentSuccess = document.getElementById('appointmentSuccess');
+    appointmentForm.addEventListener('submit', function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        var formIsValid = appointmentForm.checkValidity();
+        var today = new Date();
+        today.setHours(0,0,0,0);
+
+        var selectedDate = appointmentDate.value ? new Date(appointmentDate.value) : null;
+        if (selectedDate) {
+            selectedDate.setHours(0,0,0,0);
+        }
+
+        if (!selectedDate || selectedDate < today) {
+            appointmentDate.classList.add('is-invalid');
+            document.getElementById('appointmentDateFeedback').textContent = 'Please choose a future appointment date.';
+            formIsValid = false;
+        } else {
+            appointmentDate.classList.remove('is-invalid');
+        }
+
+        if (!formIsValid) {
+            appointmentForm.classList.add('was-validated');
+            return;
+        }
+
+        appointmentForm.classList.remove('was-validated');
+                appointmentForm.submit();
+});
+</script>
+
+{% endblock %}

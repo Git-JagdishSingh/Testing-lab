@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block title %}Appointment confirmed{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow-sm border-success">
+            <div class="card-body text-center py-5">
+                <div class="mb-3">
+                    <i class="bi bi-check-circle-fill text-success" style="font-size: 3rem;"></i>
+                </div>
+                <h2 class="fw-bold">Appointment confirmed</h2>
+                <p class="text-muted">Your appointment has been booked successfully. Create an account or log in to track appointment status and receive updates.</p>
+
+                <div class="card bg-light mt-4">
+                    <div class="card-body text-start">
+                        <h5 class="fw-semibold">Booking details</h5>
+                        <dl class="row mb-0">
+                            <dt class="col-sm-4">Laboratory</dt>
+                            <dd class="col-sm-8">{{ appointment.laboratory.name }}</dd>
+                            <dt class="col-sm-4">Full name</dt>
+                            <dd class="col-sm-8">{{ appointment.full_name }}</dd>
+                            <dt class="col-sm-4">Contact number</dt>
+                            <dd class="col-sm-8">{{ appointment.contact_number }}</dd>
+                            <dt class="col-sm-4">Email</dt>
+                            <dd class="col-sm-8">{{ appointment.email_address }}</dd>
+                            <dt class="col-sm-4">Appointment date</dt>
+                            <dd class="col-sm-8">{{ appointment.appointment_date }}</dd>
+                            <dt class="col-sm-4">Reference</dt>
+                            <dd class="col-sm-8">{{ appointment.reference_number }}</dd>
+                            <dt class="col-sm-4">Booked on</dt>
+                            <dd class="col-sm-8">{{ appointment.created_at }}</dd>
+                        </dl>
+                    </div>
+                </div>
+
+                <div class="mt-4 d-flex justify-content-center gap-2 flex-wrap">
+                    <a href="{% url 'laboratory-detail' appointment.laboratory.slug %}" class="btn btn-primary">Back to laboratory</a>
+                    {% if not user.is_authenticated %}
+                        <a href="{% url 'register' %}" class="btn btn-outline-primary">Register</a>
+                        <a href="{% url 'login' %}" class="btn btn-outline-secondary">Login</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

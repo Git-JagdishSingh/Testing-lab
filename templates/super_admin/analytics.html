@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% block title %}Super Admin Analytics{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <div class="col-md-6 col-xl-3">
+        <div class="card shadow-sm border-0 rounded-4 h-100">
+            <div class="card-body">
+                <h2 class="h6 text-muted">Laboratories</h2>
+                <p class="display-6 fw-semibold mb-0">{{ stats.labs }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-3">
+        <div class="card shadow-sm border-0 rounded-4 h-100">
+            <div class="card-body">
+                <h2 class="h6 text-muted">Companies</h2>
+                <p class="display-6 fw-semibold mb-0">{{ stats.companies }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-3">
+        <div class="card shadow-sm border-0 rounded-4 h-100">
+            <div class="card-body">
+                <h2 class="h6 text-muted">Pending approvals</h2>
+                <p class="display-6 fw-semibold mb-0">{{ stats.pending }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-3">
+        <div class="card shadow-sm border-0 rounded-4 h-100">
+            <div class="card-body">
+                <h2 class="h6 text-muted">Reports</h2>
+                <p class="display-6 fw-semibold mb-0">{{ stats.reports }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm border-0 rounded-4 mt-4">
+    <div class="card-body">
+        <h2 class="h5 mb-3">Platform overview</h2>
+        <p class="text-muted mb-0">This dashboard gives super admins a quick picture of platform growth, approval backlog, and recent reporting activity.</p>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block title %}Respond to Quote - TestLab Finder{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-body p-4 p-lg-5">
+                <h1 class="h3 mb-3">Respond to quote request</h1>
+                <div class="mb-4">
+                    <p class="fw-semibold mb-1">Company</p>
+                    <p class="mb-1">{{ quote_request.company_name|default:quote_request.contact_name|default:quote_request.requested_by.get_full_name }}</p>
+                    <p class="text-muted mb-0">{{ quote_request.contact_email }} · {{ quote_request.contact_phone }}</p>
+                </div>
+                <div class="mb-4">
+                    <p class="fw-semibold mb-1">Testing requirements</p>
+                    <p class="mb-1"><strong>Test type:</strong> {{ quote_request.test_type|default:'Not specified' }}</p>
+                    <p class="mb-1"><strong>Product/sample:</strong> {{ quote_request.product_or_sample_details|default:'Not specified' }}</p>
+                    <p class="mb-1"><strong>Preferred timeline:</strong> {{ quote_request.preferred_timeline|default:'Not specified' }}</p>
+                    <p class="mb-0"><strong>Notes:</strong> {{ quote_request.message|default:'No additional notes' }}</p>
+                </div>
+                <form method="post" class="row g-3">
+                    {% csrf_token %}
+                    <div class="col-12">
+                        <label class="form-label" for="{{ form.status.id_for_label }}">Status</label>
+                        {{ form.status }}
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label" for="{{ form.quote_amount.id_for_label }}">Quote amount</label>
+                        {{ form.quote_amount }}
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label" for="{{ form.lab_response.id_for_label }}">Lab response</label>
+                        {{ form.lab_response }}
+                    </div>
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary">Save response</button>
+                        <a href="{% url 'quote-list' %}" class="btn btn-outline-secondary ms-2">Back to list</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

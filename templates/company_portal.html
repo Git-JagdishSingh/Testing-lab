@@ -1,0 +1,237 @@
+{% extends 'base.html' %}
+{% block title %}Company Portal - TestLab Finder{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <div class="col-12">
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+            <div class="card-body p-4 p-lg-5 bg-primary text-white">
+                <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
+                    <div>
+                        <p class="text-uppercase small fw-semibold mb-2">Company Portal</p>
+                        <h1 class="h3 mb-2">Manage bookings, track testing history, and stay on top of compliance.</h1>
+                        <p class="mb-0 text-white-50">A business-friendly workspace for companies to coordinate laboratory partnerships and service requests.</p>
+                    </div>
+                    <div class="d-flex flex-wrap gap-2">
+                        <a href="{% url 'request-quote' %}" class="btn btn-outline-light fw-semibold">
+                            <i class="bi bi-send me-2"></i>Request a quote
+                        </a>
+                        <a href="{% url 'company-report-download' %}" class="btn btn-light text-primary fw-semibold">
+                            <i class="bi bi-download me-2"></i>Download report
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm rounded-4 h-100">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <h2 class="h5 mb-0">Appointments</h2>
+                    <span class="badge bg-primary-subtle text-primary">{{ appointments|length }}</span>
+                </div>
+                {% if appointments %}
+                    <ul class="list-group list-group-flush">
+                        {% for appointment in appointments %}
+                            <li class="list-group-item px-0">
+                                <div class="d-flex justify-content-between align-items-start gap-2">
+                                    <div>
+                                        <div class="fw-semibold">{{ appointment.laboratory.name }}</div>
+                                        <div class="small text-muted">{{ appointment.appointment_date }} · {{ appointment.full_name }}</div>
+                                    </div>
+                                    <span class="badge rounded-pill bg-info-subtle text-info">{{ appointment.get_status_display }}</span>
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="text-muted mb-0">No appointments have been booked with your laboratories yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm rounded-4 h-100">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <h2 class="h5 mb-0">Saved laboratories</h2>
+                    <span class="badge bg-success-subtle text-success">{{ favorite_labs|length }}</span>
+                </div>
+                {% if favorite_labs %}
+                    <ul class="list-group list-group-flush">
+                        {% for favorite in favorite_labs %}
+                            <li class="list-group-item px-0">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <div class="fw-semibold">{{ favorite.laboratory.name }}</div>
+                                        <div class="small text-muted">{{ favorite.laboratory.city }}, {{ favorite.laboratory.state }}</div>
+                                    </div>
+                                    <form method="post" class="d-inline">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="action" value="favorite-toggle">
+                                        <input type="hidden" name="laboratory_slug" value="{{ favorite.laboratory.slug }}">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">Remove</button>
+                                    </form>
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="text-muted mb-0">Save critical labs to keep them handy for future requests.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm rounded-4 h-100">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <h2 class="h5 mb-0">Compliance reminders</h2>
+                    <span class="badge bg-warning-subtle text-warning">{{ reminders|length }}</span>
+                </div>
+                {% if reminders %}
+                    <ul class="list-group list-group-flush">
+                        {% for reminder in reminders %}
+                            <li class="list-group-item px-0">
+                                <div class="fw-semibold">{{ reminder.title }}</div>
+                                <div class="small text-muted">Due {{ reminder.due_date }} · {{ reminder.description }}</div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="text-muted mb-0">No reminders are scheduled right now.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-7">
+        <div class="card border-0 shadow-sm rounded-4 h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h2 class="h5 mb-0">Request a quotation</h2>
+                    <a href="{% url 'request-quote' %}" class="btn btn-sm btn-outline-primary">Open full form</a>
+                </div>
+                <form method="post" class="row g-3">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="quotation-request">
+                    <div class="col-12">
+                        {{ quotation_form.laboratory.label_tag }}
+                        {{ quotation_form.laboratory }}
+                    </div>
+                    <div class="col-12">
+                        {{ quotation_form.test_type.label_tag }}
+                        {{ quotation_form.test_type }}
+                    </div>
+                    <div class="col-12">
+                        {{ quotation_form.product_or_sample_details.label_tag }}
+                        {{ quotation_form.product_or_sample_details }}
+                    </div>
+                    <div class="col-12">
+                        {{ quotation_form.company_name.label_tag }}
+                        {{ quotation_form.company_name }}
+                    </div>
+                    <div class="col-md-6">
+                        {{ quotation_form.contact_name.label_tag }}
+                        {{ quotation_form.contact_name }}
+                    </div>
+                    <div class="col-md-6">
+                        {{ quotation_form.contact_email.label_tag }}
+                        {{ quotation_form.contact_email }}
+                    </div>
+                    <div class="col-md-6">
+                        {{ quotation_form.contact_phone.label_tag }}
+                        {{ quotation_form.contact_phone }}
+                    </div>
+                    <div class="col-md-6">
+                        {{ quotation_form.location.label_tag }}
+                        {{ quotation_form.location }}
+                    </div>
+                    <div class="col-12">
+                        {{ quotation_form.preferred_timeline.label_tag }}
+                        {{ quotation_form.preferred_timeline }}
+                    </div>
+                    <div class="col-12">
+                        {{ quotation_form.message.label_tag }}
+                        {{ quotation_form.message }}
+                    </div>
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary">Submit request</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-5">
+        <div class="card border-0 shadow-sm rounded-4 h-100">
+            <div class="card-body">
+                <h2 class="h5 mb-3">Explore trusted laboratories</h2>
+                {% if available_laboratories %}
+                    <ul class="list-group list-group-flush">
+                        {% for lab in available_laboratories %}
+                            <li class="list-group-item px-0">
+                                <div class="d-flex justify-content-between align-items-center gap-2">
+                                    <div>
+                                        <div class="fw-semibold">{{ lab.name }}</div>
+                                        <div class="small text-muted">{{ lab.city }}, {{ lab.state }}</div>
+                                    </div>
+                                    <form method="post" class="d-inline">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="action" value="favorite-toggle">
+                                        <input type="hidden" name="laboratory_slug" value="{{ lab.slug }}">
+                                        <button type="submit" class="btn btn-sm btn-outline-primary">Save</button>
+                                    </form>
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="text-muted mb-0">No additional approved laboratories are available right now.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12">
+        <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <h2 class="h5 mb-0">Recent quotation requests</h2>
+                    <span class="badge bg-secondary-subtle text-secondary">{{ quotation_requests|length }}</span>
+                </div>
+                {% if quotation_requests %}
+                    <div class="table-responsive">
+                        <table class="table align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Subject</th>
+                                    <th>Laboratory</th>
+                                    <th>Status</th>
+                                    <th>Requested</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for quotation in quotation_requests %}
+                                    <tr>
+                                        <td>{{ quotation.subject|default:quotation.test_type|default:'Quote request' }}</td>
+                                        <td>{{ quotation.laboratory|default:'N/A' }}</td>
+                                        <td>{{ quotation.get_status_display }}</td>
+                                        <td>{{ quotation.created_at|date:'M d, Y' }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-muted mb-0">No quote requests yet. Send one from the form above.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
